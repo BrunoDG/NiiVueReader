@@ -1,41 +1,54 @@
 <template>
-    <div ref="canvasContainer" class="niivue-container"></div>
+    <canvas ref="canvasContainer" class="niivue-container"></canvas>
 </template>
 
 <script lang="ts" setup>
 // 1) Imports
 import { onMounted, ref } from 'vue'
 import { Niivue } from '@niivue/niivue'
-
-// 2) Definir props e emits com as novas APIs
-interface PointAddedPayload {
-    mm: [number, number, number]
-    idx: [number, number, number]
-}
+import type { Point } from '../stores/PointsStore'
+import axios from 'axios'
 
 const props = defineProps<{
     volumeUrl: string
 }>()
 
 const emit = defineEmits<{
-    (e: 'point-added', payload: PointAddedPayload): void
+    (e: 'point-added', payload: Point): void
 }>()
 
 // 3) Lógica do setup
-const canvasContainer = ref<HTMLDivElement | null>(null)
+const canvasContainer = ref<HTMLCanvasElement | null>(null)
 let nv: Niivue | null = null
 
 onMounted(async () => {
     nv = new Niivue()
     if (canvasContainer.value) {
         // TODO: Check what did he want to do with this canvas
+        // Fixed. Now canvasContainer is a HTMLCanvasElement 
         nv.attachToCanvas(canvasContainer.value)
     }
-    await nv.loadVolumes([{ url: props.volumeUrl, name: 'mainVolume' }])
 
-    // TODO: Verify how function onLocationChange works proper
-    nv.onLocationChange = (mm: any, vx: any) => {
-        emit('point-added', { mm, idx: vx })
+    try {
+        console.log('Fetching volume...')
+        const response = await axios.get(props.volumeUrl)
+
+        console.log('Volume fetched, loading on Niivue...')
+
+        await nv.loadVolumes([{ url: response.data.url }])
+
+        console.log('Volume loaded succesfully')
+    } catch (error) {
+        console.error('Error loading volume: ', error);
+    }
+    
+    // TODO: Verify how function onLocationChange works properly
+    nv.onLocationChange = (point: Point) => {
+        const payload: Point = {
+            mm: point.mm,
+            idx: point.idx,
+        };
+        emit('point-added', payload);
     }
 })
 </script>

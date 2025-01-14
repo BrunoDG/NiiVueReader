@@ -3,5 +3,12 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true, // Permite interoperabilidade entre CommonJS e ESM
+    "noEmit": false,
+    "declaration": true,
+    "declarationDir": "./types"
+  },
 }
