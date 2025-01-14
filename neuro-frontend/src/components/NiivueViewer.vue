@@ -1,14 +1,12 @@
 <template>
-    <div class="w-full h-full relative">
-        <canvas ref="canvasContainer" class="niivue-container"></canvas>
-    </div>
+    <canvas ref="canvasContainer" class="niivue-container"></canvas>
 </template>
 
 <script lang="ts" setup>
 // 1) Imports
-import { onMounted, ref } from 'vue'
-import { Niivue, NVMesh } from '@niivue/niivue'
-import type { Point } from '../stores/PointsStore'
+import { onMounted, ref, watch } from 'vue'
+import { Niivue, type NVConnectomeNode} from '@niivue/niivue'
+import { usePointsStore, type Point } from '../stores/PointsStore'
 import axios from 'axios'
 
 const props = defineProps<{
@@ -22,6 +20,18 @@ const emit = defineEmits<{
 // 3) Lógica do setup
 const canvasContainer = ref<HTMLCanvasElement | null>(null)
 let nv: Niivue | null = null
+const pointsStore = usePointsStore()
+
+function convertPointsToConnectomeNodes(): NVConnectomeNode[] {
+    return pointsStore.points.map((point) => ({
+        name: "node",
+        x: point.mm[0],
+        y: point.mm[1],
+        z: point.mm[2],
+        sizeValue: 5,
+        colorValue: 123,
+    }))
+}
 
 onMounted(async () => {
     nv = new Niivue()
@@ -50,20 +60,14 @@ onMounted(async () => {
     // TODO: Verify how function onLocationChange works properly
     nv.onMouseUp = () => {
         emit('point-added', payload);
-
-        /*nv?.addMesh({
-            pts: new Float32Array([...payload.mm]),
-            tris: new Uint32Array([0, 0, 0]),
-            name: `node`,
-            rgba255: new Uint8Array([0, 0, 255]),
-            opacity: 1.0,
-        })*/
     }
+
+    watch(
+        () => pointsStore.points,
+        () => {
+            const nodes = convertPointsToConnectomeNodes()
+            nv.meshes[0].nodes = nodes
+        }
+    )
 })
 </script>
-
-<style scoped>
-canvas {
-    display: block;
-}
-</style>
