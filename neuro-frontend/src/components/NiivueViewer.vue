@@ -1,11 +1,13 @@
 <template>
-    <canvas ref="canvasContainer" class="niivue-container"></canvas>
+    <div class="w-full h-full relative">
+        <canvas ref="canvasContainer" class="niivue-container"></canvas>
+    </div>
 </template>
 
 <script lang="ts" setup>
 // 1) Imports
 import { onMounted, ref } from 'vue'
-import { Niivue } from '@niivue/niivue'
+import { Niivue, NVMesh } from '@niivue/niivue'
 import type { Point } from '../stores/PointsStore'
 import axios from 'axios'
 
@@ -23,6 +25,8 @@ let nv: Niivue | null = null
 
 onMounted(async () => {
     nv = new Niivue()
+    let payload: Point;
+
     if (canvasContainer.value) {
         // TODO: Check what did he want to do with this canvas
         // Fixed. Now canvasContainer is a HTMLCanvasElement 
@@ -30,33 +34,36 @@ onMounted(async () => {
     }
 
     try {
-        console.log('Fetching volume...')
         const response = await axios.get(props.volumeUrl)
-
-        console.log('Volume fetched, loading on Niivue...')
-
         await nv.loadVolumes([{ url: response.data.url }])
-
-        console.log('Volume loaded succesfully')
     } catch (error) {
         console.error('Error loading volume: ', error);
     }
-    
-    // TODO: Verify how function onLocationChange works properly
+
     nv.onLocationChange = (point: Point) => {
-        const payload: Point = {
+        payload = {
             mm: point.mm,
             idx: point.idx,
         };
+    }
+    
+    // TODO: Verify how function onLocationChange works properly
+    nv.onMouseUp = () => {
         emit('point-added', payload);
+
+        /*nv?.addMesh({
+            pts: new Float32Array([...payload.mm]),
+            tris: new Uint32Array([0, 0, 0]),
+            name: `node`,
+            rgba255: new Uint8Array([0, 0, 255]),
+            opacity: 1.0,
+        })*/
     }
 })
 </script>
 
 <style scoped>
-.niivue-container {
-    width: 100%;
-    height: 600px;
-    position: relative;
+canvas {
+    display: block;
 }
 </style>
