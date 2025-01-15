@@ -11,13 +11,13 @@
         <TimeSeriesChart :points="pointsStore.points" />
       </div>
       <div class="flex-1 p-4 border rounded bg-gray-100 shadow">
-        <h2 class="text-lg font-bold justify-between">Selected Points</h2>
+        <h2 class="text-lg font-bold items-center justify-between">Selected Points</h2>
         <div v-for="(p, idx) in pointsStore.points" :key="idx"
           class="flex items-center gap-2 mt-2 border rounded shadow">
           <div>
             {{ p.mm }} (mm) - {{ p.idx }} (voxel)
           </div>
-          <button @click="removePoint(idx)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 items-end">
+          <button @click="removePoint(idx)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 jsutify-end">
             Remove
           </button>
         </div>

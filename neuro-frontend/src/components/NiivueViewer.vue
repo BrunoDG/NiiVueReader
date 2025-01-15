@@ -20,22 +20,13 @@ const emit = defineEmits<{
 // 3) Lógica do setup
 const canvasContainer = ref<HTMLCanvasElement | null>(null)
 let nv: Niivue | null = null
-const pointsStore = usePointsStore()
-
-function convertPointsToConnectomeNodes(): NVConnectomeNode[] {
-    return pointsStore.points.map((point) => ({
-        name: "node",
-        x: point.mm[0],
-        y: point.mm[1],
-        z: point.mm[2],
-        sizeValue: 5,
-        colorValue: 123,
-    }))
-}
 
 onMounted(async () => {
     nv = new Niivue()
-    let payload: Point;
+    let payload: Point = {
+        mm: [0, 0, 0],
+        idx: [0,0,0],
+    }
 
     if (canvasContainer.value) {
         // TODO: Check what did he want to do with this canvas
@@ -59,15 +50,11 @@ onMounted(async () => {
     
     // TODO: Verify how function onLocationChange works properly
     nv.onMouseUp = () => {
-        emit('point-added', payload);
-    }
-
-    watch(
-        () => pointsStore.points,
-        () => {
-            const nodes = convertPointsToConnectomeNodes()
-            nv.meshes[0].nodes = nodes
+        if (payload.mm && payload.idx) {
+            emit('point-added', payload);
+        } else {
+            console.warn('Ignored interaction, since it\'s not on a 2D view')
         }
-    )
+    }
 })
 </script>
