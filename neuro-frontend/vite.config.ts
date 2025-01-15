@@ -1,8 +1,8 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "path";
-import tailwindcss from 'tailwindcss'
-import autoprefixer from 'autoprefixer'
+import { fileURLToPath, URL } from 'node:url';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   plugins: [vue()],
@@ -13,9 +13,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      buffer: "buffer", // Adiciona o alias para o módulo buffer
-    },
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
   },
   define: {
     global: "globalThis", // Emula o objeto global no navegador

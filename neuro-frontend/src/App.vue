@@ -1,46 +1,49 @@
 <template>
   <div class="flex flex-col lg:flex-row">
-    <div class="h-screen w-[60%]">
-      <NiivueViewer :volumeUrl="volumeUrl" @point-added="onPointAdded" />
+    <!-- Viewer Section (Left) -->
+    <div class="flex-1 lg:w-[60%] h-full p-1">
+      <div class="h-full border rounded bg-gray-50 shadow">
+        <NiivueViewer :volumeUrl="volumeUrl" />
+      </div>
     </div>
 
-    <!-- Selected points list -->
-    <div class="mt-4 w-[40%]">
-      <!-- Data Chart -->
-      <div class="flex-1 p-4 border rounded bg-gray-100 shadow">
+    <!-- Right Section (Chart and Table) -->
+    <div class="flex flex-col lg:w-[40%] h-full p-1 gap-2">
+      <!-- Time Series Chart -->
+      <div class="flex-1">
         <TimeSeriesChart :points="pointsStore.points" />
       </div>
-      <div class="flex-1 p-4 border rounded bg-gray-100 shadow">
-        <h2 class="text-lg font-bold items-center justify-between">Selected Points</h2>
-        <div v-for="(p, idx) in pointsStore.points" :key="idx"
-          class="flex items-center gap-2 mt-2 border rounded shadow">
-          <div>
-            {{ p.mm }} (mm) - {{ p.idx }} (voxel)
-          </div>
-          <button @click="removePoint(idx)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 jsutify-end">
-            Remove
-          </button>
-        </div>
+
+      <!-- Nodes Table -->
+      <div class="flex-1">
+        <Card class="h-full">
+          <CardHeader>
+            <CardTitle class="items-center">Selected Points</CardTitle>
+            <CardDescription>
+              Manage selected points from the viewer.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <NodesTable />
+          </CardContent>
+        </Card>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import NiivueViewer from './components/NiivueViewer.vue'
-import TimeSeriesChart from './components/TimeSeriesChart.vue'
-import { usePointsStore } from './stores/PointsStore.ts'
+import NiivueViewer from '@/components/NiivueViewer.vue'
+import TimeSeriesChart from '@/components/TimeSeriesChart.vue'
+import NodesTable from '@/components/NodesTable.vue'
+import { usePointsStore } from '@/stores/PointsStore'
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card'
 
 // Store and variables
 const pointsStore = usePointsStore()
 const volumeUrl = 'http://localhost:8000/api/volume'
-
-// event functions
-function onPointAdded(payload: { mm: [number, number, number]; idx: [number, number, number] }) {
-  pointsStore.addPoint(payload)
-}
-
-function removePoint(index: number) {
-  pointsStore.removePoint(index)
-}
 </script>
+
+<style scoped>
+/* Personalize estilos aqui, se necessário */
+</style>

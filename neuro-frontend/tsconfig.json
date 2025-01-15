@@ -6,9 +6,12 @@
   ],
   "compilerOptions": {
     "strict": true,
-    "esModuleInterop": true, // Permite interoperabilidade entre CommonJS e ESM
-    "noEmit": false,
+    "esModuleInterop": true,
     "declaration": true,
-    "declarationDir": "./types"
+    "declarationDir": "./types",
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
   },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["node_modules"]
 }

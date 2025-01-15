@@ -1,54 +1,68 @@
 <template>
-    <div ref="chartDiv" style="width: 100%; height: 400px;"></div>
+  <Card>
+    <CardContent>
+      <div ref="chartDiv" style="width: 100%; height: 400px;"></div>
+    </CardContent>
+    <CardFooter>
+      <Button variant="outline" size="sm" @click="refreshChart">Refresh</Button>
+    </CardFooter>
+  </Card>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import * as Plotly from 'plotly.js-dist-min'
-import type { Point } from '../stores/PointsStore'
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import type { Point } from '@/stores/PointsStore'
 
 // Definindo props e seus tipos
 const props = defineProps<{
-    points: Point[]
+  points: Point[]
 }>()
 
 const chartDiv = ref<HTMLDivElement | null>(null)
 
 function plotChart() {
-    if (!chartDiv.value) return
+  if (!chartDiv.value) return
 
-    const data: Plotly.Data[] = props.points.map((p, idx) => {
-        const xValues = Array.from({ length: 10 }, (_, i) => i)
-        const yValues = xValues.map(() => Math.random() * 100)
+  const data: Plotly.Data[] = props.points.map((p, idx) => {
+    const xValues = Array.from({ length: 10 }, (_, i) => i)
+    const yValues = xValues.map(() => Math.random() * 100)
 
-        return {
-            x: xValues,
-            y: yValues,
-            type: 'scatter',
-            mode: 'lines+markers',
-            name: `Point ${idx}`,
-        }
-    })
-
-    const layout = {
-        title: 'Time Series for Selected Points',
-        xaxis: { title: 'Time' },
-        yaxis: { title: 'Signal Intensity' },
+    return {
+      x: xValues,
+      y: yValues,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: `Point ${idx}`,
     }
-    const config = { responsive: true }
+  })
 
-    Plotly.newPlot(chartDiv.value, data, layout, config)
+  const layout = {
+    title: 'Time Series for Selected Points',
+    xaxis: { title: 'Time' },
+    yaxis: { title: 'Signal Intensity' },
+  }
+  const config = { responsive: true }
+
+  Plotly.newPlot(chartDiv.value, data, layout, config)
+}
+
+// Função para atualizar o gráfico
+function refreshChart() {
+  plotChart()
 }
 
 onMounted(() => {
-    plotChart()
+  plotChart()
 })
 
 watch(
-    () => props.points,
-    () => {
-        plotChart()
-    },
-    { deep: true }
+  () => props.points,
+  () => {
+    plotChart()
+  },
+  { deep: true }
 )
 </script>
