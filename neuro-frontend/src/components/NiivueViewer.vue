@@ -3,10 +3,10 @@
 </template>
 
 <script lang="ts" setup>
-// 1) Imports
-import { onMounted, ref, watch } from 'vue'
-import { Niivue, type NVConnectomeNode} from '@niivue/niivue'
-import { usePointsStore, type Point } from '../stores/PointsStore'
+
+import { onMounted, ref } from 'vue'
+import { Niivue } from '@niivue/niivue'
+import type { Point } from '../stores/PointsStore'
 import axios from 'axios'
 
 const props = defineProps<{
@@ -17,7 +17,6 @@ const emit = defineEmits<{
     (e: 'point-added', payload: Point): void
 }>()
 
-// 3) Lógica do setup
 const canvasContainer = ref<HTMLCanvasElement | null>(null)
 let nv: Niivue | null = null
 
@@ -29,8 +28,6 @@ onMounted(async () => {
     }
 
     if (canvasContainer.value) {
-        // TODO: Check what did he want to do with this canvas
-        // Fixed. Now canvasContainer is a HTMLCanvasElement 
         nv.attachToCanvas(canvasContainer.value)
     }
 
@@ -47,8 +44,8 @@ onMounted(async () => {
             idx: point.idx,
         };
     }
-    
-    // TODO: Verify how function onLocationChange works properly
+
+    // TODO: read from uiData, how is it calling and how do I read this property
     nv.onMouseUp = () => {
         if (payload.mm && payload.idx) {
             emit('point-added', payload);
