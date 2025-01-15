@@ -3,7 +3,7 @@ name = "backend"
 version = "0.1.0"
 description = "backend for neurotech test project"
 authors = [
-    {name = "Bruno Dias",email = "brunodg.dev@gmail.com"}
+    {name = "Bruno Dias",email = "bruno@beveldrive.com.br"}
 ]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,6 +13,8 @@ dependencies = [
     "python-multipart (>=0.0.20,<0.0.21)"
 ]
 
+[tool.poetry]
+package-mode = false
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
