@@ -2,9 +2,9 @@
     <Card>
         <!-- Header -->
         <CardHeader>
-            <CardTitle>3D Visualization</CardTitle>
+            <CardTitle>Brain Scan Visualization</CardTitle>
             <CardDescription>
-                Interact with the 3D visualization of the medical data below.
+                Interact with the medical data visualization below.
             </CardDescription>
         </CardHeader>
 
@@ -94,7 +94,8 @@ function updateNodeMesh() {
         new Uint8Array([255, 0, 0, 255]),
         1.0,
         true,
-        nv.gl
+        nv.gl,
+        "node"
     )
 
     nv.addMesh(mesh)
