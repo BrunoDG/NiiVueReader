@@ -1,19 +1,16 @@
 <template>
-  <Card>
+  <Card class="max-w-full lg:max-w-600px h-[360px]">
     <CardContent>
-      <div ref="chartDiv" style="width: 100%; height: 400px;"></div>
+      <div ref="chartDiv" style="width: 100%; height: 340px;"></div>
     </CardContent>
-    <CardFooter>
-      <Button variant="outline" size="sm" @click="refreshChart">Refresh</Button>
-    </CardFooter>
   </Card>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import * as Plotly from 'plotly.js-dist-min'
-import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, /*CardHeader, CardFooter, CardTitle, CardDescription*/ } from '@/components/ui/card';
+//import { Button } from '@/components/ui/button';
 import type { Point } from '@/stores/PointsStore'
 
 // Definindo props e seus tipos

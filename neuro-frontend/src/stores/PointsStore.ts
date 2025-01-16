@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 export interface Point {
   mm: [number, number, number];
   idx: [number, number, number];
+  string: string;
 }
 
 export const usePointsStore = defineStore("points", {

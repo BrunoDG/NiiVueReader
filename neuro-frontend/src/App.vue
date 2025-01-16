@@ -1,14 +1,15 @@
 <template>
-  <div class="flex flex-col lg:flex-row">
-    <!-- Viewer Section (Left) -->
-    <div class="flex-1 lg:w-[60%] h-full p-1">
-      <div class="h-full border rounded bg-gray-50 shadow">
-        <NiivueViewer :volumeUrl="volumeUrl" />
-      </div>
+  <div class="flex flex-col h-screen bg-black">
+    <!-- MenuBar -->
+    <MenuBar class="bg-gray-800 text-white shadow-md" />
+
+    <!-- Viewer Section (Canvas) -->
+    <div class="flex-1 bg-black">
+      <NiivueViewer :volumeUrl="volumeUrl" />
     </div>
 
-    <!-- Right Section (Chart and Table) -->
-    <div class="flex flex-col lg:w-[40%] h-full p-1 gap-2">
+    <!-- Bottom Section (Chart and Table) -->
+    <div class="flex flex-col lg:flex-row h-[40%] p-2 gap-2 bg-black">
       <!-- Time Series Chart -->
       <div class="flex-1">
         <TimeSeriesChart :points="pointsStore.points" />
@@ -16,34 +17,19 @@
 
       <!-- Nodes Table -->
       <div class="flex-1">
-        <Card class="h-full">
-          <CardHeader>
-            <CardTitle class="items-center">Selected Points</CardTitle>
-            <CardDescription>
-              Manage selected points from the viewer.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <NodesTable />
-          </CardContent>
-        </Card>
+        <NodesTable />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import NiivueViewer from '@/components/NiivueViewer.vue'
-import TimeSeriesChart from '@/components/TimeSeriesChart.vue'
-import NodesTable from '@/components/NodesTable.vue'
-import { usePointsStore } from '@/stores/PointsStore'
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card'
+import MenuBar from '@/components/MenuBar.vue';
+import NiivueViewer from '@/components/NiivueViewer.vue';
+import TimeSeriesChart from '@/components/TimeSeriesChart.vue';
+import NodesTable from '@/components/NodesTable.vue';
+import { usePointsStore } from '@/stores/PointsStore';
 
-// Store and variables
-const pointsStore = usePointsStore()
-const volumeUrl = 'http://localhost:8000/api/volume'
+const pointsStore = usePointsStore();
+const volumeUrl = 'http://localhost:8000/api/volume';
 </script>
-
-<style scoped>
-/* Personalize estilos aqui, se necessário */
-</style>
