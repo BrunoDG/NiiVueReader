@@ -4,7 +4,7 @@
     <MenuBar class="bg-gray-800 text-white shadow-md" />
 
     <!-- Viewer Section (Canvas) -->
-    <div class="flex-1 bg-black">
+    <div class="flex-1 bg-black content-center">
       <NiivueViewer :volumeUrl="volumeUrl" />
     </div>
 

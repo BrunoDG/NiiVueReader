@@ -17,6 +17,6 @@ export default defineConfig({
     }
   },
   define: {
-    global: "globalThis", // Emula o objeto global no navegador
+    global: "globalThis", // Emulates global object on browser
   },
 });

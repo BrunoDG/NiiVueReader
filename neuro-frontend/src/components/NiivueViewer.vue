@@ -26,7 +26,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import { Niivue, NVMesh, type NVConnectomeNode } from '@niivue/niivue';
+import { Niivue, NVMesh, type NVConnectomeNode, NVConnectome } from '@niivue/niivue';
 import axios from 'axios';
 // Ui Components
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu';
@@ -34,7 +34,6 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 // Points store properties
 import { Point, usePointsStore } from '@/stores/PointsStore';
-import { isConstructorDeclaration } from 'typescript';
 
 const props = defineProps<{
     volumeUrl: string
@@ -113,7 +112,7 @@ function addNode(point: Point) {
             throw new Error("No visualization to alter");
         }
 
-        /*if (nv.meshes.length === 0) {
+        if (nv.meshes.length === 0) {
             console.warn('No meshes found. Creating new Mesh...');
 
             const newConnectome = new NVMesh(
@@ -127,22 +126,15 @@ function addNode(point: Point) {
             )
 
             nv.addMesh(newConnectome);
-            //nv.updateGLVolume();
-            nv.drawScene();
         }
 
         const pts = convertPointToNode(point)
 
-        const connectome = nv.meshes[0];
-        if (!connectome.nodes) {
-            connectome.nodes = [];
-            connectome.nodes.push(pts);
-        } else {
-            connectome.nodes?.push(pts);
-        }
+        const connectome = nv.meshes[0] as NVConnectome;
+        connectome.addConnectomeNode(pts);
 
-        //nv.handleNodeAdded(pts);
-        nv.meshes[0].updateMesh(nv.gl);*/
+        connectome.updateMesh(nv.gl);
+        nv.updateGLVolume();
         toast({
             title: "Success",
             description: "Node added succesfully"
