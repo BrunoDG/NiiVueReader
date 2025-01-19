@@ -1,15 +1,15 @@
 # Niivue 3D File Reader - Test task
 
-The task was to create a simple 3D `.nii.gz` file viewer with Vue 3, Typescript, Niivue and Plotly.
+The task was to create a simple 3D `.nii.gz` file viewer with Vue 3, Javascript, Niivue and Plotly.
 It was decided that this was to be created with the stack defined below.
 
 ## Tech Stack
 
-Frontend:
+Frontend - `frontend-js`:
 
 - Node v22.9.0
 - Vue 3
-- Typescript
+- Javascript
 - Plotly.js
 - Niivue
 - Shadcn/Vue (For layout and interface)
@@ -58,4 +58,4 @@ and your frontend will be ready to go.
 
 ## Project Structure
 
-Inside each folder, from `neuro-frontend` and `backend`, you can find more about each part's structures.
+Inside each folder, from `frontend-js` and `backend`, you can find more about each part's structures.

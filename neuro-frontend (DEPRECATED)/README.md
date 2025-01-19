@@ -1,4 +1,4 @@
-# Frontend Structure
+# DEPRECATED - Frontend Structure
 
 - public
 - src
