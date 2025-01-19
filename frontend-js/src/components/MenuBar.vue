@@ -24,14 +24,18 @@
 
 <script setup>
 import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent, MenubarItem, MenubarSeparator } from '@/components/ui/menubar';
+import { useVisualizationStore } from '@/stores/VisualizationStore';
+
+const visualizationStore = useVisualizationStore();
 
 // Função para upload (placeholder)
 function uploadFile() {
-  console.log('Upload clicked');
+    console.log('Upload clicked');
 }
 
 // Função para alternar visualização (placeholder)
 function setView(view) {
-  console.log(`Switching to ${view} view`);
+    visualizationStore.setView(view);
+    console.log(`Switching to ${view} view`);
 }
 </script>

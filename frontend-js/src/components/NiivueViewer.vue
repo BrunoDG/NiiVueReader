@@ -4,34 +4,20 @@
         <canvas id="canvasContainer" ref="canvasContainer" class="w-full h-full"></canvas>
 
         <!-- Floating Dropdown Menu Button -->
-        <div class="absolute -top-10 right-2 z-10">
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-                {{ selectedView }} View
-            </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="relative right-2">
-            <DropdownMenuItem @click="setView('Axial')">Axial</DropdownMenuItem>
-            <DropdownMenuItem @click="setView('Sagittal')">Sagittal</DropdownMenuItem>
-            <DropdownMenuItem @click="setView('Coronal')">Coronal</DropdownMenuItem>
-            <DropdownMenuItem @click="setView('3D')">3D</DropdownMenuItem>
-            <DropdownMenuItem @click="setView('Mixed')">Mixed</DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <div class="absolute -top-10 right-4 z-10 text-white text-xl">
+            {{ selectedView }} View
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import * as niivue from '@niivue/niivue';
+import {cmapper} from '@niivue/niivue';
 import axios from 'axios';
-// UI Components
-import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-// Points store
+// Stores
 import { usePointsStore } from '@/stores/PointsStore';
+import { useVisualizationStore } from '@/stores/VisualizationStore';
 
 // Props
 const props = defineProps({
@@ -39,6 +25,7 @@ const props = defineProps({
 });
 
 const pointsStore = usePointsStore();
+const visualizationStore = useVisualizationStore();
 
 // Refs and variables
 const canvasContainer = ref(null);
@@ -86,105 +73,107 @@ function adjustCanvasHeight() {
     canvasHeight.value = (width / 16) * 9; // 16:9 aspect ratio
 }
 
-function addConnectomeNode(node) {
-    log.debug('adding node', node)
-    if (!this.nodes) {
-      throw new Error('nodes not defined')
-    }
-
-    ;(this.nodes).push(node)
-    this.updateLabels()
-    this.nodesChanged.dispatchEvent(new CustomEvent('nodeAdded', { detail: { node } }))
-  }
-
-function deleteConnectomeNode(node){
-    // delete any connected edges
-    const index = (this.nodes).indexOf(node)
-    const edges = this.edges
-    if (edges) {
-      this.edges = edges.filter((e) => e.first !== index && e.second !== index)
-    }
-    this.nodes = (this.nodes).filter((n) => n !== node)
-
-    this.updateLabels()
-    this.updateConnectome(this.gl)
-    this.nodesChanged.dispatchEvent(new CustomEvent('nodeDeleted', { detail: { node } }))
-  }
-
 /**
- * Add node to the mesh and update the canvas
- * @param {{ mm: number[], idx: number[], string: string }} point - Node to add
+ * Updates all mesh nodes labels
  */
-function addNode(point) {
-    try {
-        let nodes = nv.meshes[0].nodes;
-        /*nv.meshes[0].addConnectomeNode({
-            name: 'node',
-            x: point.mm[0],
-            y: point.mm[1],
-            z: point.mm[2],
-            colorValue: 1,
-            sizeValue: 1
-        });*/
+function updateLabels() {
+    const nodes = nv.meshes[0].nodes;
+    if (!nodes || nodes.length === 0) return;
 
-        if (!nodes) {
-            throw new Error('nodes not defined')
+    // Encontra o maior node
+    const largest = nodes.reduce((a, b) => (a.sizeValue > b.sizeValue ? a : b)).sizeValue;
+
+    let min = nodes[0].colorValue;
+    let max = nodes[0].colorValue;
+
+    // Define min e max para os valores de cor
+    for (let i = 1; i < nodes.length; i++) {
+        if (nodes[i].colorValue < min) min = nodes[i].colorValue;
+        if (nodes[i].colorValue > max) max = nodes[i].colorValue;
+    }
+
+    const lut = cmapper.colormap('viridis', false); // Exemplo de colormap
+    const lutNeg = cmapper.colormap('magma', false); // Colormap negativo, se necessário
+
+    for (let i = 0; i < nodes.length; i++) {
+        let color = nodes[i].colorValue;
+        let isNeg = color < 0;
+        if (isNeg) color = -color;
+
+        color = Math.round(((color - min) / (max - min)) * 255) * 4;
+        let rgba = [lut[color], lut[color + 1], lut[color + 2], 255];
+
+        if (isNeg) {
+            rgba = [lutNeg[color], lutNeg[color + 1], lutNeg[color + 2], 255];
         }
 
-        ;(nodes).push({
-            name: 'node',
-            x: point.mm[0],
-            y: point.mm[1],
-            z: point.mm[2],
-            colorValue: 1,
-            sizeValue: 1
-        });
-        nv.meshes[0].updateLabels();
-
-        nv.meshes[0].updateMesh(nv.gl);
-        nv.updateGLVolume();
-
-        console.log('Node added successfully');
-
-        pointsStore.addPoint(point);
-        nv.drawScene();
-    } catch (error) {
-        console.error('Error adding node: ', error.message);
+        nodes[i].label = {
+            name: nodes[i].name,
+            color: rgba,
+            scale: nodes[i].sizeValue / largest,
+        };
     }
+
+    console.log('Labels updated successfully.');
 }
 
 /**
- * Remove node from the mesh and update the canvas
- * @param {{ mm: number[], idx: number[]. string: string }} point - Node to remove
+ * Adds node to mesh and updates canvas
+ * @param {Object} node - Node to be added
  */
-function deleteNode(point) {
-    try {
-        let nodes = nv.meshes[0].nodes;
-        if (nodes.length < 1) return;
-        let pts = convertPointToNode(point);
-        let minDx = Number.POSITIVE_INFINITY;
-        let minIdx = 0;
-        for (let i = 0; i < nodes.length; i++) {
-            let dx = Math.sqrt(
-                Math.pow(XYZmm[0] - nodes[i].x, 2) +
-                Math.pow(XYZmm[1] - nodes[i].y, 2) +
-                Math.pow(XYZmm[2] - nodes[i].z, 2)
-            );
-            if (dx < minDx) {
-                minDx = dx;
-                minIdx = i;
-            }
-        }
-        console.log("Node " + minIdx + " is " + minDx + "mm from the click");
-        const tolerance = 15.0; //e.g. only 15mm from clicked location
-        if (minDx > tolerance) return;
-        
-        nv.meshes[0].deleteConnectionNode(nv.meshes[0].nodes(minIdx));
-        nv.meshes[0].updateMesh(nv.gl);
-        nv.updateGLVolume();
-    } catch (error) {
-        console.log('Error deleting node: ', error.message);
+function addConnectomeNode(node) {
+    let nodes = nv.meshes[0].nodes;
+    if (!nodes)
+    {
+        nv.meshes[0].nodes = [];
+        nv.meshes[0].nodes.push(node);
+    } else {
+        nv.meshes[0].nodes.push(node);
     }
+
+    updateLabels();
+    nv.meshes[0].updateMesh(nv.gl);
+    nv.updateGLVolume();
+
+    console.log('Node added:', node);
+}
+
+
+/**
+ * Removes node from mesh based on proximity
+ * @param {Object} point - Node to be removed.
+ */
+function deleteConnectomeNode(point) {
+    const nodes = nv.meshes[0].nodes || [];
+    if (nodes.length === 0) return;
+
+    let minDx = Infinity;
+    let minIdx = -1;
+
+    for (let i = 0; i < nodes.length; i++) {
+        const dx = Math.sqrt(
+            Math.pow(point.mm[0] - nodes[i].x, 2) +
+            Math.pow(point.mm[1] - nodes[i].y, 2) +
+            Math.pow(point.mm[2] - nodes[i].z, 2)
+        );
+
+        if (dx < minDx) {
+            minDx = dx;
+            minIdx = i;
+        }
+    }
+
+    if (minDx > 15) { // 15mm tolerance
+        console.log('No nodes within tolerance.');
+        return;
+    }
+
+    nodes.splice(minIdx, 1); // Remove o node
+    updateLabels();
+    nv.meshes[0].updateMesh(nv.gl);
+    nv.updateGLVolume();
+
+    console.log('Node deleted:', point);
 }
 
 /**
@@ -251,10 +240,18 @@ onMounted(async () => {
 
             if (existingPointIndex !== -1) {
                 // Deleting existing node
-                deleteNode(existingPointIndex);
+                deleteConnectomeNode(payload);
             } else {
                 // Adding new node, since it doesn't exist on the stored list
-                addNode(payload);
+                addConnectomeNode({
+                    name: 'node',
+                    x: payload.mm[0],
+                    y: payload.mm[1],
+                    z: payload.mm[2],
+                    colorValue: payload.idx[0],
+                    sizeValue: 1
+                });
+                pointsStore.addPoint(payload);
             }
         }
     };
@@ -263,4 +260,11 @@ onMounted(async () => {
 });
 
 window.addEventListener('resize', adjustCanvasHeight);
+
+watch(
+    () => visualizationStore.selectedView,
+    (newView) => {
+        setView(newView);
+    }
+);
 </script>
