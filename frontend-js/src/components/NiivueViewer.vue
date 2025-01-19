@@ -7,6 +7,23 @@
         <div class="absolute -top-10 right-4 z-10 text-white text-xl">
             {{ selectedView }} View
         </div>
+
+        <!-- Opacity Slider -->
+        <div class="absolute -bottom-12 right-2 z-10 bg-white p-4 rounded shadow-md">
+            <div class="flex items-center gap-4">
+                <label for="opacity-slider" class="text-sm font-medium">Opacity</label>
+                <Slider
+                    class="w-[100px]"
+                    v-model="opacity"
+                    :default-value="[100]"
+                    :min="0"
+                    :max="100"
+                    :step="1"
+                    :onValueChange="setOpacity(opacity)"
+                />
+                <span class="text-sm font-medium">{{ opacity[0] }}%</span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -15,6 +32,8 @@ import { onMounted, ref, watch } from 'vue';
 import * as niivue from '@niivue/niivue';
 import {cmapper} from '@niivue/niivue';
 import axios from 'axios';
+// UI Components
+import { Slider } from '@/components/ui/slider';
 // Stores
 import { usePointsStore } from '@/stores/PointsStore';
 import { useVisualizationStore } from '@/stores/VisualizationStore';
@@ -32,6 +51,19 @@ const canvasContainer = ref(null);
 const canvasHeight = ref(600); // Initial canvas height
 const selectedView = ref('Mixed');
 let nv = null;
+const opacity = ref([100]);
+
+/**
+ * Define a opacidade do modelo 3D.
+ * @param {number} value Valor da opacidade (0 a 100).
+ */
+function setOpacity(value) {
+  if (nv && nv.volumes.length > 0) {
+    console.log('Opacity value changed to ', value);
+    nv.volumes[0].opacity = value / 100; // Converte para intervalo de 0 a 1
+    nv.updateGLVolume();
+  }
+}
 
 /**
  * Set NIfTI file rendering view on canvas
