@@ -69,4 +69,5 @@ Inside each folder, from `frontend` and `backend`, you can find more about each 
 
 ## Demo Video
 
-<video controls src="images/NiivueReader_ToolDemo.mp4" title="Title"></video>
+If not available here, you can checkout at the folder `images/NiivueReader_ToolDemo.mp4` to see what the tool is capable of doing.
+[![Demonstration Video](images/NiivueReader_Pic02.png)(images/NiivueReader_ToolDemo.mp4)]
