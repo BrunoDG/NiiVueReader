@@ -5,7 +5,7 @@
 
         <!-- Viewer Section -->
         <div class="flex-1 bg-black content-center">
-            <NiivueViewer :volume-url="volumeUrl" />
+            <NiivueViewer :volume-url="currentFileUrl" />
         </div>
 
         <!-- Bottom Section -->
@@ -21,7 +21,7 @@
         </div>
 
         <!-- File Picker Modal -->
-        <FilePickerView :isVisible="showModal" @close="closeFilePickerModal" />
+        <FilePickerView :isVisible="showModal" @close="closeFilePickerModal" @file-selected="loadFile" />
     </div>
 </template>
 
@@ -35,7 +35,7 @@ import { usePointsStore } from '@/stores/PointsStore';
 import { ref } from 'vue';
 
 const pointsStore = usePointsStore();
-const volumeUrl = 'http://localhost:8000/api/volume';
+const currentFileUrl = ref('http://localhost:8000/api/volume');
 
 const showModal = ref(false);
 
@@ -45,6 +45,11 @@ function openFilePickerModal() {
 
 function closeFilePickerModal() {
     showModal.value = false;
+}
+
+function loadFile(fileUrl) {
+    currentFileUrl.value = fileUrl;
+    closeFilePickerModal();
 }
 
 </script>

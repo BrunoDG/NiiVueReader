@@ -222,6 +222,16 @@ function findPointIndex(mm) {
     );
 }
 
+async function updateVolume(newVolumeUrl) {
+    try {
+        const response = await axios.get(props.volumeUrl);
+        await nv.loadVolumes([{ url: response.data.url }]);
+        nv.updateGLVolume();
+    } catch (error) {
+        console.error('Failed to load volume: ', error);
+    }
+}
+
 // Initialize Niivue
 onMounted(async () => {
     let coordChange = false;
@@ -246,9 +256,9 @@ onMounted(async () => {
     nv.addMesh(nodeMesh);
 
     try {
-        const response = await axios.get(props.volumeUrl);
-        const volumeUrl = response.data.url;
-        await nv.loadVolumes([{ url: volumeUrl }]);
+        if (props.volumeUrl) {
+            await updateVolume(props.volumeUrl);
+        }
     } catch (error) {
         console.log('Error handling volume: ', error);
     }
@@ -293,6 +303,17 @@ onMounted(async () => {
 
 window.addEventListener('resize', adjustCanvasHeight);
 
+// Watches chenges on volumeUrl to reload volume
+watch(
+    () => props.volumeUrl,
+    (newVolumeUrl) => {
+        if (newVolumeUrl) {
+            updateVolume(newVolumeUrl);
+        }
+    }
+);
+
+// Watches changes on store's selectedView
 watch(
     () => visualizationStore.selectedView,
     (newView) => {

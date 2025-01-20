@@ -69,3 +69,4 @@ Inside each folder, from `frontend` and `backend`, you can find more about each 
 
 ## Demo Video
 
+<video controls src="images/NiivueReader_ToolDemo.mp4" title="Title"></video>
