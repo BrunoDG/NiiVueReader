@@ -59,3 +59,13 @@ and your frontend will be ready to go.
 ## Project Structure
 
 Inside each folder, from `frontend` and `backend`, you can find more about each part's structures.
+
+## Images
+
+![Picture 1](images/NiivueReader_Pic01.png)
+![picture 2](images/NiivueReader_Pic02.png)
+![Axial View](images/NiivueReader_Pic03.png)
+![3D Mesh with Oppacity](images/NiivueReader_Pic04.png)
+
+## Demo Video
+
