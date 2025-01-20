@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 import os
 
 app = FastAPI()
@@ -22,8 +23,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Directories
+DATA_DIR = "data"
+UPLOADS_DIR = "uploads"
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# Endpoints
 @app.get("/api/volume")
 def get_volume():
+    """Returns default NIfTI file URL
+
+    Returns:
+        url: File URL requested by frontend 
+    """
     filename = "mpld_asl.nii.gz"
     file_url = f"http://localhost:8000/api/data/{filename}"
     
@@ -31,7 +44,18 @@ def get_volume():
 
 @app.get("/api/data/{filename}")
 def get_file(filename: str):
-    file_path = os.path.join("data", filename)
+    """Returns requested file
+
+    Args:
+        filename (str): file requested from frontend
+
+    Raises:
+        HTTPException: Error informing that file does not existe
+
+    Returns:
+        FileResponse: File attachment with current file
+    """
+    file_path = os.path.join(DATA_DIR, filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     
@@ -43,6 +67,17 @@ def get_file(filename: str):
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
+    """Uploads a .nii or .nii.gz file
+
+    Args:
+        file (UploadFile, optional): Requested upload file. Defaults to File(...).
+
+    Raises:
+        HTTPException: Error on uploaded file.
+
+    Returns:
+        _type_: _description_
+    """
     if not (file.filename.endswith('.nii.gz') or file.filename.endswith('.nii')):
         raise HTTPException(status_code=400, detail="Unsupported file format")
 
@@ -51,4 +86,8 @@ async def upload_file(file: UploadFile = File(...)):
         content = await file.read()
         out_file.write(content)
 
-    return {"detail": "File uploaded successfully", "filename": file.filename}
+    return {
+        "detail": "File uploaded successfully", 
+        "filename": file.filename, 
+        "path": f"http://localhost:8000/api/data/{file.filename}",
+    }

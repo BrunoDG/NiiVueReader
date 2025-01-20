@@ -30,7 +30,7 @@ First of all, you need to make sure that you have both Node.js and Python 3 inst
 
 But you can use Python from 3.10 and above, as well as Node from v20 and above. After making sure your machine has those two softwares installed, you need to clone this repository onto your PC with:
 
-    > `git clone https://github.com/BrunoDG/NiiVueReader`
+    > git clone https://github.com/BrunoDG/NiiVueReader
 
 After cloning the repository, you will need to run some commands to make sure your program will install properly.
 
@@ -39,11 +39,11 @@ After cloning the repository, you will need to run some commands to make sure yo
 To install and run the backend locally, you need to [install poetry first](https://python-poetry.org/docs/#installation). After installing Poetry, you need to run the command `poetry install`, to make sure it will install all project dependencies.
 Before running the backend, you need to run the virtual environment for the backend. Poetry makes it easy to run as easy as to just run the command:
 
-    > `poetry env activate`
+    > poetry env activate
 
 After that, all you need to do is to run the command:
 
-    > `poetry run uvicorn main:app --reload
+    > poetry run main
 
 And your backend will be ready to go.
 
@@ -52,10 +52,10 @@ And your backend will be ready to go.
 To install all components from the frontend, when you made sure you have node and npm installed on your machine, you can run `npm install`.
 After npm finishes installing all dependencies, you can run
 
-    > `npm run dev` 
+    > npm run dev 
 
 and your frontend will be ready to go.
 
 ## Project Structure
 
-Inside each folder, from `frontend-js` and `backend`, you can find more about each part's structures.
+Inside each folder, from `frontend` and `backend`, you can find more about each part's structures.
